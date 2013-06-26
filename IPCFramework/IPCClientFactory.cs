@@ -32,7 +32,7 @@ namespace IPCFramework
 			string _endId;
 			string _rpcMethod;
 
-			string ComputeEndId (string connectionId)
+			string ComputeEndId(string connectionId)
 			{
 				StringBuilder sb = new StringBuilder();
 				if (connectionId.StartsWith("FLExBridgeEndpoint"))
@@ -55,14 +55,16 @@ namespace IPCFramework
 					_waitObject = waitObject;
 					_cleanup = cleanup;
 					_sock = new Socket(AddressFamily.Unix, SocketType.Stream, 0);
-					Console.WriteLine("IPCClient[{0}].Initialize() - connecting to {1}", _endId, connectionId);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCClient[{0}].Initialize() - connecting to {1}", _endId, connectionId);
 					var endPoint = new AbstractUnixEndPoint(connectionId);
 					_sock.Connect(endPoint);
 					return true;
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine("IPCClient[{0}].Initialize() - caught exception: {1}", _endId, e.Message);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCClient[{0}].Initialize() - caught exception: {1}", _endId, e.Message);
 					return false;
 				}
 			}
@@ -78,7 +80,8 @@ namespace IPCFramework
 				{
 					_rpcMethod = rpcMethod;
 					_signalDone = null;
-					Console.WriteLine("IPCClient[{0}].RemoteCall(\"{1}\", ...) - calling _sock.Send()", _endId, rpcMethod);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCClient[{0}].RemoteCall(\"{1}\", ...) - calling _sock.Send()", _endId, rpcMethod);
 					var bytes = CreateSendData(rpcMethod, args);
 					_sock.Send(bytes, 0, bytes.Length, SocketFlags.None);
 					GetReturnValue();
@@ -101,8 +104,9 @@ namespace IPCFramework
 				{
 					_rpcMethod = rpcMethod;
 					_signalDone = signalDone;
-					Console.WriteLine("IPCClient[{0}].RemoteCall(\"{1}\", ..., signalDone) - calling _sock.BeginSend(..., SendCallback, ...)",
-					                  _endId, rpcMethod);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCClient[{0}].RemoteCall(\"{1}\", ..., signalDone) - calling _sock.BeginSend(..., SendCallback, ...)",
+							_endId, rpcMethod);
 					var bytes = CreateSendData(rpcMethod, args);
 					_sock.BeginSend(bytes, 0, bytes.Length, SocketFlags.None, SendCallback, _sock);
 					return true;
@@ -132,6 +136,8 @@ namespace IPCFramework
 				{
 				}
 			}
+			
+			public int VerbosityLevel { get; set; }
 			#endregion
 
 			/// <summary>
@@ -182,34 +188,38 @@ namespace IPCFramework
 			{
 				try
 				{
-//					Console.WriteLine("IPCHost[{0}].GetReturnValue() for {1} - calling _sock.BeginReceive(..., ReceiveCallback, ...)",
-//					                  _endId, _rpcMethod);
-					byte[] buffer = new byte[1024];
-					_sock.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None,  ReceiveCallback, new ReturnValueHelp(_rpcMethod, _sock, _signalDone, _endId));
+					if (VerbosityLevel >= 2)
+						Console.WriteLine("IPCHost[{0}].GetReturnValue() for {1} - calling _sock.BeginReceive(..., ReceiveCallback, ...)",
+							_endId, _rpcMethod);
+					var help = new ReturnValueHelp(_rpcMethod, _sock, _signalDone, _endId);
+					_sock.BeginReceive(help.Buffer, 0, help.Buffer.Length, SocketFlags.None,  ReceiveCallback, help);
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine("IPCClient[{0}].GetReturnValue() for {1} - caught exception: {2}",
-					                  _endId, _rpcMethod, e.Message);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCClient[{0}].GetReturnValue() for {1} - caught exception: {2}",
+							_endId, _rpcMethod, e.Message);
 				}
 			}
 
 			private void ReceiveCallback(IAsyncResult iar)
 			{
-				ReturnValueHelp help = (ReturnValueHelp)iar.AsyncState;
+				var help = (ReturnValueHelp)iar.AsyncState;
 				try
 				{
 					var len = help.Socket.EndReceive(iar);
 					var retval = Encoding.UTF8.GetString(help.Buffer, 0, len);
-					Console.WriteLine("IPCClient[{0}].ReceiveCallback() for {1} - _sock.EndReceive() => \"{2}\"",
-					                  help.EndId, help.MethodName, retval);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCClient[{0}].ReceiveCallback() for {1} - _sock.EndReceive() => \"{2}\"",
+							help.EndId, help.MethodName, retval);
 					if (help.SignalDone != null)
 						help.SignalDone();
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine("IPCClient[{0}].ReceiveCallback() for {1} - caught exception: {2}",
-					                  help.EndId, help.MethodName, e.Message);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCClient[{0}].ReceiveCallback() for {1} - caught exception: {2}",
+							help.EndId, help.MethodName, e.Message);
 				}
 			}
 
@@ -225,8 +235,9 @@ namespace IPCFramework
 				{
 					var sock = (Socket)iar.AsyncState;
 					sock.EndSend(iar);
-//					Console.WriteLine("IPCClient[{0}].SendCallback() for {1} - _sock.EndSend() finished",
-//					                  _endId, _rpcMethod);
+					if (VerbosityLevel >= 2)
+						Console.WriteLine("IPCClient[{0}].SendCallback() for {1} - _sock.EndSend() finished",
+							_endId, _rpcMethod);
 					GetReturnValue();
 				}
 				catch (SocketException)
@@ -235,13 +246,15 @@ namespace IPCFramework
 					if (_signalDone != null)
 						_signalDone();
 					Monitor.Pulse(_waitObject);
-					Console.WriteLine("IPCClient[{0}].SendCallback() for {1} - caught SocketException and woke up Host (?)",
-					                  _endId, _rpcMethod);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCClient[{0}].SendCallback() for {1} - caught SocketException and woke up Host (?)",
+							_endId, _rpcMethod);
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine("IPCClient[{0}].SendCallback() for {1} - caught Exception: {2}",
-					                  _endId, _rpcMethod, e.Message);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCClient[{0}].SendCallback() for {1} - caught Exception: {2}",
+							_endId, _rpcMethod, e.Message);
 				}
 				finally
 				{

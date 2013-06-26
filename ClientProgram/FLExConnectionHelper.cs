@@ -36,6 +36,7 @@ namespace ClientProgram
 			var pipeId = options.Keys.Count == 0 || !options.ContainsKey("-pipeID") ? "" : options["-pipeID"];
 
 			_host = IPCHostFactory.Create();
+			_host.VerbosityLevel = 1;
 			bool fOK = _host.Initialize<FLExService,IFLExService>("FLExEndpoint" + pipeId, null, null);
 			if (!fOK)
 			{
@@ -44,6 +45,7 @@ namespace ClientProgram
 				return false;
 			}
 			_client = IPCClientFactory.Create();
+			_client.VerbosityLevel = 1;
 			_client.Initialize<IFLExBridgeService>("FLExBridgeEndpoint" + pipeId, FLExService.WaitObject, null);
 			if (!_client.RemoteCall("BridgeReady"))
 				_client = null;	//FLEx isn't listening.

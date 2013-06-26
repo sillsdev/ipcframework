@@ -30,6 +30,11 @@ namespace IPCFramework
 		/// Close a host connection.
 		/// </Summary>
 		void Close();
+		
+		/// <summary>
+		/// Flag whether to write verbose debugging output to the console.
+		/// </summary>
+		int VerbosityLevel { get; set; }
 	}
 
 	/// <summary>
@@ -113,9 +118,11 @@ namespace IPCFramework
 		/// <summary>
 		/// Close the client connection.
 		/// </summary>
-		/// <remarks>
-		/// IS THIS NEEDED?
-		/// </remarks>
 		void Close();
+		
+		/// <summary>
+		/// Flag whether to write verbose debugging output to the console.
+		/// </summary>
+		int VerbosityLevel { get; set; }
 	}
 }

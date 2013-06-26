@@ -78,7 +78,8 @@ namespace IPCFramework
 				try
 				{
 					_host = new Socket(AddressFamily.Unix, SocketType.Stream, 0);
-					Console.WriteLine("IPCHost[{0}].Initialize(): binding to {1}", _endId, connectionId);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCHost[{0}].Initialize(): binding to {1}", _endId, connectionId);
 					var endPoint = new AbstractUnixEndPoint(connectionId);
 					_host.Bind(endPoint);
 					_host.Listen(5);
@@ -86,7 +87,8 @@ namespace IPCFramework
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine("IPCHost[{0}].Initialize - caught exception: {1}", _endId, ex.Message);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCHost[{0}].Initialize - caught exception: {1}", _endId, ex.Message);
 					if (_host != null)
 					{
 						_host.Close();
@@ -112,6 +114,8 @@ namespace IPCFramework
 					_host = null;
 				}
 			}
+
+			public int VerbosityLevel { get; set; }
 			#endregion
 
 			/// <summary>
@@ -128,14 +132,16 @@ namespace IPCFramework
 				// Create the state object.
 				var state = new UnixIPCState(_serviceClass);
 				state.WorkSocket = handler;
-//				Console.WriteLine("IPCHost[{0}].SocketAcceptCallback() - calling handler.BeginReceive(..., HostReceiveCallback, ...)", _endId);
+				if (VerbosityLevel >= 2)
+					Console.WriteLine("IPCHost[{0}].SocketAcceptCallback() - calling handler.BeginReceive(..., HostReceiveCallback, ...)", _endId);
 				handler.BeginReceive(state.Buffer, 0, UnixIPCState.BufferSize, 0,
 					new AsyncCallback(HostReceiveCallback), state);
 				while (_host != null)
 				{
 					if (handler.Poll(10000, SelectMode.SelectError))
 					{
-//						Console.WriteLine("IPCHost[{0}].SocketAcceptCallback() - calling alert and cleanup delegates", _endId);
+						if (VerbosityLevel >= 2)
+							Console.WriteLine("IPCHost[{0}].SocketAcceptCallback() - calling alert and cleanup delegates", _endId);
 						if (_alert != null)
 							_alert();
 						if (_cleanup != null)
@@ -148,7 +154,8 @@ namespace IPCFramework
 
 			void HostReceiveCallback(IAsyncResult ar)
 			{
-//				Console.WriteLine("IPCHost[{0}].HostReceiveCallback()", _endId);
+				if (VerbosityLevel >= 2)
+					Console.WriteLine("IPCHost[{0}].HostReceiveCallback()", _endId);
 				bool done = false;
 				var state = (UnixIPCState)ar.AsyncState;
 				var handler = state.WorkSocket;
@@ -156,7 +163,8 @@ namespace IPCFramework
 				{
 					// Read data from the client socket.
 					int bytesRead = handler.EndReceive(ar);
-//					Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - handler.EndReceive() read {1} bytes", _endId, bytesRead);
+					if (VerbosityLevel >= 2)
+						Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - handler.EndReceive() read {1} bytes", _endId, bytesRead);
 					if (bytesRead > 0)
 					{
 						// There  might be more data, so store the data received so far.
@@ -166,7 +174,8 @@ namespace IPCFramework
 						if (content.Contains("<EOF>"))
 						{
 							string[] msg = content.Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
-//							Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - message = \"{1}\"", _endId, msg[0]);
+							if (VerbosityLevel >= 2)
+								Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - message = \"{1}\"", _endId, msg[0]);
 							var methodInfo = _serviceClass.GetMethod(msg[0]);
 							var parInfo = methodInfo.GetParameters();
 							object[] parameters = new object[parInfo.Length];
@@ -181,12 +190,14 @@ namespace IPCFramework
 									parameters[i] = Int32.Parse(msg[i+1]);
 							}
 							methodInfo.Invoke(state.Service, parameters);
-							Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): finished executing {1}", _endId, msg[0]);
+							if (VerbosityLevel >= 1)
+								Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): finished executing {1}", _endId, msg[0]);
 							object[] attributes = methodInfo.GetCustomAttributes(typeof(FinishServerTask), true);
 							if (attributes.Length > 0)
 								done = true;
 							state.Bldr.Clear();
-//							Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): calling handler.Send(\"finish:{1}\") - done = {2}", _endId, msg[0], done);
+							if (VerbosityLevel >= 2)
+								Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): calling handler.Send(\"finish:{1}\") - done = {2}", _endId, msg[0], done);
 							handler.Send(Encoding.UTF8.GetBytes("finish:"+msg[0]+"\n<EOF>"));
 						}
 						else
@@ -195,7 +206,8 @@ namespace IPCFramework
 						}
 						if (!done)
 						{
-//							Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): calling handler.BeginReceive(..., HostReceiveCallback, ...)", _endId);
+							if (VerbosityLevel >= 2)
+								Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): calling handler.BeginReceive(..., HostReceiveCallback, ...)", _endId);
 							handler.BeginReceive(state.Buffer, 0, UnixIPCState.BufferSize, 0,
 							                     new AsyncCallback(HostReceiveCallback), state);
 						}
@@ -203,7 +215,8 @@ namespace IPCFramework
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - caught exception: {1}", _endId, e.Message);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - caught exception: {1}", _endId, e.Message);
 					if (_alert != null)
 						_alert();
 					if (_cleanup != null)
