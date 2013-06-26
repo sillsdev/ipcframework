@@ -1,0 +1,4 @@
+*.userprefs
+*.suo
+output/
+obj/
