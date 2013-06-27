@@ -41,8 +41,8 @@ namespace ServerProgram
 		{
 			get
 			{
-				var f = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-				return f.Substring(Environment.OSVersion.Platform == PlatformID.Unix ? 5 : 6);
+				var p = FileUtils.StripFilePrefix(Assembly.GetExecutingAssembly().CodeBase);
+				return Path.GetDirectoryName(p);
 			}
 		}
 		public static string ProjectsDirectory

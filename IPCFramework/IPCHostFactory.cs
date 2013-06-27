@@ -294,6 +294,8 @@ namespace IPCFramework
 				}
 				_host = null;
 			}
+
+			public int VerbosityLevel { get; set; }
 			#endregion
 		}
 #endif		

@@ -324,6 +324,8 @@ namespace IPCFramework
 				if (_cleanup != null)
 					_cleanup();
 			}
+
+			public int VerbosityLevel { get; set; }
 			#endregion
 
 			/// <summary>
