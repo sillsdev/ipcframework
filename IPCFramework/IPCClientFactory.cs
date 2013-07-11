@@ -23,7 +23,7 @@ namespace IPCFramework
 		}
 
 #if __MonoCS__
-		private class UnixIPCClient : IIPCClient
+		internal class UnixIPCClient : IIPCClient
 		{
 			object _waitObject;
 			SimpleCallback _cleanup;
@@ -51,13 +51,14 @@ namespace IPCFramework
 			{
 				try
 				{
+					var id = IPCHostFactory.UnixIPCHost.TruncateId(connectionId);
 					_endId = ComputeEndId(connectionId);
 					_waitObject = waitObject;
 					_cleanup = cleanup;
 					_sock = new Socket(AddressFamily.Unix, SocketType.Stream, 0);
 					if (VerbosityLevel >= 1)
-						Console.WriteLine("IPCClient[{0}].Initialize() - connecting to {1}", _endId, connectionId);
-					var endPoint = new AbstractUnixEndPoint(connectionId);
+						Console.WriteLine("IPCClient[{0}].Initialize() - connecting to {1}", _endId, id);
+					var endPoint = new AbstractUnixEndPoint(id);
 					_sock.Connect(endPoint);
 					return true;
 				}

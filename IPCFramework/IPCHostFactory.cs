@@ -39,7 +39,7 @@ namespace IPCFramework
 		}
 
 #if __MonoCS__
-		private class UnixIPCHost : IIPCHost
+		internal class UnixIPCHost : IIPCHost
 		{
 			Socket _host;
 			Type _serviceClass;
@@ -53,23 +53,10 @@ namespace IPCFramework
 				Close();
 			}
 
-			string ComputeEndId (string connectionId)
-			{
-				StringBuilder sb = new StringBuilder();
-				if (connectionId.StartsWith("FLExBridgeEndpoint"))
-					sb.Append("Bridge-");
-				else
-					sb.Append("FLEx-");
-				int idxBegin = connectionId.IndexOf(".fwdata");
-				idxBegin += 7;
-				int idxEnd = connectionId.IndexOf("_", idxBegin);
-				sb.Append(connectionId.Substring(idxBegin, idxEnd - idxBegin));
-				return sb.ToString();
-			}
-
 			#region Implement IIPCHost methods
 			public bool Initialize<TClass,TInterface>(string connectionId, SimpleCallback alert, SimpleCallback cleanup)
 			{
+				var id = TruncateId(connectionId);
 				_endId = ComputeEndId(connectionId);
 				_host = null;
 				_serviceClass = typeof(TClass);
@@ -79,8 +66,8 @@ namespace IPCFramework
 				{
 					_host = new Socket(AddressFamily.Unix, SocketType.Stream, 0);
 					if (VerbosityLevel >= 1)
-						Console.WriteLine("IPCHost[{0}].Initialize(): binding to {1}", _endId, connectionId);
-					var endPoint = new AbstractUnixEndPoint(connectionId);
+						Console.WriteLine("IPCHost[{0}].Initialize(): binding to {1}", _endId, id);
+					var endPoint = new AbstractUnixEndPoint(id);
 					_host.Bind(endPoint);
 					_host.Listen(5);
 					_host.BeginAccept(new AsyncCallback(SocketAcceptCallback), _host);
@@ -118,6 +105,38 @@ namespace IPCFramework
 			public int VerbosityLevel { get; set; }
 			#endregion
 
+			/// <summary>
+			/// Truncate the specified connectionId.  The byte array for a socket address
+			/// derived from this string has a maximum length of 107 (+1 for the leading
+			/// NUL byte that indicates an "abstract" connection).
+			/// </summary>
+			internal static string TruncateId(string id)
+			{
+				var min = id.IndexOf('/');
+				var lim = id.LastIndexOf('/');
+				if (min < lim)
+				{
+					var x = id.Remove(min, lim - min);
+					x = x.Replace(".fwdata","/");
+					return x;
+				}
+				return id.Replace(".fwdata", "/");
+			}
+
+			string ComputeEndId(string id)
+			{
+				StringBuilder sb = new StringBuilder();
+				if (id.StartsWith("FLExBridgeEndpoint"))
+					sb.Append("Bridge-");
+				else
+					sb.Append("FLEx-");
+				int idxBegin = id.IndexOf(".fwdata");
+				idxBegin += 7;
+				int idxEnd = id.IndexOf("_", idxBegin);
+				sb.Append(id.Substring(idxBegin, idxEnd - idxBegin));
+				return sb.ToString();
+			}
+			
 			/// <summary>
 			/// This callback operates on its own thread.  After finishing the Accept operation,
 			/// start an asynchronous BeginReceive operation on yet another thread.  After
