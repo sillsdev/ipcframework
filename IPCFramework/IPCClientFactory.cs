@@ -278,17 +278,26 @@ namespace IPCFramework
 			#region Implement IIPCClient methods
 			public bool Initialize<TInterface>(string connectionId, object waitObject, SimpleCallback cleanup)
 			{
-				_clientType = typeof(TInterface);
-				_waitObject = waitObject;
-				_cleanup = cleanup;
-				var clientPipeBinding = new NetNamedPipeBinding {ReceiveTimeout = TimeSpan.MaxValue};
-				var factory = new ChannelFactory<TInterface>(clientPipeBinding,
-					new EndpointAddress("net.pipe://localhost/" + connectionId + "/FLExPipe"));
-				_channel = factory.CreateChannel();
-				var pi = _clientType.GetProperty("OperationTimeout");
-				if (pi != null)
-					pi.SetValue(_channel, TimeSpan.MaxValue, null);
-				return true;
+				try
+				{
+					_clientType = typeof(TInterface);
+					_waitObject = waitObject;
+					_cleanup = cleanup;
+					var clientPipeBinding = new NetNamedPipeBinding {ReceiveTimeout = TimeSpan.MaxValue};
+					var factory = new ChannelFactory<TInterface>(clientPipeBinding,
+						new EndpointAddress("net.pipe://localhost/" + connectionId + "/FLExPipe"));
+					_channel = factory.CreateChannel();
+					var pi = _clientType.GetProperty("OperationTimeout");
+					if (pi != null)
+						pi.SetValue(_channel, TimeSpan.MaxValue, null);
+					return true;
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine("WindowsIPCClient.Initialize(\"{0}\") caught exception: {1}",
+						connectionId, ex.Message);
+					throw;
+				}
 			}
 
 			public bool RemoteCall(string rpcMethod)
@@ -298,20 +307,40 @@ namespace IPCFramework
 
 			public bool RemoteCall(string rpcMethod, object[] args)
 			{
-				var mi = _clientType.GetMethod(rpcMethod);
-				if (mi != null)
-					mi.Invoke(_channel, args);
-				return true;
+				try
+				{
+					var mi = _clientType.GetMethod(rpcMethod);
+					if (mi != null)
+						mi.Invoke(_channel, args);
+					return true;
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine("WindowsIPCClient.RemoteCall(\"{0}\") caught exception: {1}",
+						rpcMethod, ex.Message);
+					if (rpcMethod == "BridgeWorkComplete")
+						return false;
+					throw;
+				}
 			}
 
 			public bool RemoteCall(string rpcMethod, SimpleCallback signalDone)
 			{
-				_signalDone = signalDone;
-				_rpcMethod = rpcMethod;
-				var mi = _clientType.GetMethod("Begin" + rpcMethod);
-				if (mi != null)
-					mi.Invoke(_channel, new object[] { (AsyncCallback)WorkDoneCallback, _channel });
-				return true;
+				try
+				{
+					_signalDone = signalDone;
+					_rpcMethod = rpcMethod;
+					var mi = _clientType.GetMethod("Begin" + rpcMethod);
+					if (mi != null)
+						mi.Invoke(_channel, new object[] { (AsyncCallback)WorkDoneCallback, _channel });
+					return true;
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine("WindowsIPCClient.RemoteCall(\"{0}\") caught exception: {1}",
+						rpcMethod, ex.Message);
+					throw;
+				}
 			}
 
 			public bool RemoteCall(string rpcMethod, object[] args, SimpleCallback signalDone)
