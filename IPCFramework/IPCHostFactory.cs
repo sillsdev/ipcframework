@@ -131,9 +131,27 @@ namespace IPCFramework
 				else
 					sb.Append("FLEx-");
 				int idxBegin = id.IndexOf(".fwdata");
-				idxBegin += 7;
-				int idxEnd = id.IndexOf("_", idxBegin);
-				sb.Append(id.Substring(idxBegin, idxEnd - idxBegin));
+				if (idxBegin >= 0)
+				{
+					idxBegin += 7;
+					int idxEnd = id.IndexOf("_", idxBegin);
+					if (idxEnd > idxBegin)
+					{
+						sb.Append(id.Substring(idxBegin, idxEnd - idxBegin));
+					}
+					else
+					{
+						sb.Append(id.Substring(idxBegin));
+					}
+				}
+				else
+				{
+					idxBegin = id.LastIndexOf("/");
+					if (idxBegin > 0)
+						sb.Append(id.Substring(idxBegin));
+					else
+						return id;
+				}
 				return sb.ToString();
 			}
 			
