@@ -287,9 +287,10 @@ namespace IPCFramework
 					var factory = new ChannelFactory<TInterface>(clientPipeBinding,
 						new EndpointAddress("net.pipe://localhost/" + connectionId + "/FLExPipe"));
 					_channel = factory.CreateChannel();
-					var pi = _clientType.GetProperty("OperationTimeout");
+
+					var pi = _channel as IServiceChannel;
 					if (pi != null)
-						pi.SetValue(_channel, TimeSpan.MaxValue, null);
+						pi.OperationTimeout = TimeSpan.MaxValue;
 					return true;
 				}
 				catch (Exception ex)
