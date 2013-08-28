@@ -215,6 +215,8 @@ namespace IPCFramework
 							help.EndId, help.MethodName, retval);
 					if (help.SignalDone != null)
 						help.SignalDone();
+					if (_cleanup != null)
+						_cleanup();
 				}
 				catch (Exception e)
 				{
@@ -250,17 +252,20 @@ namespace IPCFramework
 					if (VerbosityLevel >= 1)
 						Console.WriteLine("IPCClient[{0}].SendCallback() for {1} - caught SocketException and woke up Host (?)",
 							_endId, _rpcMethod);
+					if (_cleanup != null)
+						_cleanup();
 				}
 				catch (Exception e)
 				{
 					if (VerbosityLevel >= 1)
 						Console.WriteLine("IPCClient[{0}].SendCallback() for {1} - caught Exception: {2}",
 							_endId, _rpcMethod, e.Message);
+					if (_cleanup != null)
+						_cleanup();
 				}
 				finally
 				{
-					if (_cleanup != null)
-						_cleanup();
+					// Do NOT call cleanup here, we don't want to cleanup until we either get the result or fail.
 					Monitor.Exit(_waitObject);
 				}
 			}
