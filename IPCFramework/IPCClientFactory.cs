@@ -32,6 +32,13 @@ namespace IPCFramework
 			string _endId;
 			string _rpcMethod;
 
+			/// <summary>
+			/// This code is currently specific to the FLExBridge/FLEx usage of this library.
+			/// It will return a pipe identifier which will fit under the UNIX limit for a
+			/// named UNIX socket.
+			/// </summary>
+			/// <returns>The end identifier.</returns>
+			/// <param name="connectionId">Connection identifier.</param>
 			string ComputeEndId(string connectionId)
 			{
 				StringBuilder sb = new StringBuilder();
@@ -40,8 +47,17 @@ namespace IPCFramework
 				else
 					sb.Append("FLEx-");
 				int idxBegin = connectionId.IndexOf(".fwdata");
-				idxBegin += 7;
-				int idxEnd = connectionId.IndexOf("_", idxBegin);
+				int idxEnd;
+				if (idxBegin > 0)
+				{
+					idxBegin += 7;
+					idxEnd = connectionId.IndexOf ("_", idxBegin);
+				}
+				else
+				{
+					idxBegin = connectionId.LastIndexOf('/');
+					idxEnd = connectionId.Length - 1;
+				}
 				sb.Append(connectionId.Substring(idxBegin, idxEnd - idxBegin));
 				return sb.ToString();
 			}
@@ -65,7 +81,7 @@ namespace IPCFramework
 				catch (Exception e)
 				{
 					if (VerbosityLevel >= 1)
-						Console.WriteLine("IPCClient[{0}].Initialize() - caught exception: {1}", _endId, e.Message);
+						Console.WriteLine("IPCClient[{0}].Initialize() - caught exception: {1}", _endId ?? connectionId, e.Message);
 					return false;
 				}
 			}
