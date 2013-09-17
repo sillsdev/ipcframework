@@ -317,7 +317,19 @@ namespace IPCFramework
 				{
 					var mi = _clientType.GetMethod(rpcMethod);
 					if (mi != null)
-						mi.Invoke(_channel, args);
+					{
+                        try
+                        {
+                            mi.Invoke(_channel, args);
+                        }
+                        catch (TargetInvocationException e)
+                        {
+                            // A dropped connection means we cannot call the other end. Return false, but don't throw.
+                            if (e.InnerException is EndpointNotFoundException)
+                                return false;
+                            throw; //other reasons for failing are exceptional
+                        }
+                    }
 					return true;
 				}
 				catch (Exception ex)
