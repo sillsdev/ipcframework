@@ -220,7 +220,7 @@ namespace IPCFramework
 							{
 								var typeName = parInfo[i].ParameterType.FullName;
 								if (typeName == "System.String")
-									parameters[i] = msg[i+1];
+									parameters[i] = msg[i+1] == "<EOF>" ? "" : msg[i+1];
 								else if (typeName == "System.Boolean")
 									parameters[i] = msg[i+1] == true.ToString();
 								else if (typeName == "System.Int32")
