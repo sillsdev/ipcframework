@@ -304,7 +304,12 @@ namespace IPCFramework
 					_clientType = typeof(TInterface);
 					_waitObject = waitObject;
 					_cleanup = cleanup;
-					var clientPipeBinding = new NetNamedPipeBinding {ReceiveTimeout = TimeSpan.MaxValue};
+					// Increase timeouts over the default values of 1 minute, allow receives to take forever to allow us to open a call which detects when
+					// the remote program crashes. This lets us lock one program out while the other end is processing.
+					var clientPipeBinding = new NetNamedPipeBinding
+					{
+						ReceiveTimeout = TimeSpan.MaxValue, OpenTimeout = TimeSpan.FromMinutes(3), SendTimeout = TimeSpan.FromMinutes(3)
+					};
 					var factory = new ChannelFactory<TInterface>(clientPipeBinding,
 						new EndpointAddress("net.pipe://localhost/" + connectionId + "/FLExPipe"));
 					_channel = factory.CreateChannel();

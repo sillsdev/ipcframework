@@ -293,7 +293,12 @@ namespace IPCFramework
 			{
 				try
 				{
-					var hostPipeBinding = new NetNamedPipeBinding { ReceiveTimeout = TimeSpan.MaxValue };
+					// Increase timeouts over the default values of 1 minute, allow receives to take forever to allow us to open a call which detects when
+					// the remote program crashes. This lets us lock one program out while the other end is processing.
+					var hostPipeBinding = new NetNamedPipeBinding
+					{
+						ReceiveTimeout = TimeSpan.MaxValue, SendTimeout = TimeSpan.FromMinutes(3), OpenTimeout = TimeSpan.FromMinutes(3)
+					};
 					//open host ready for business
 					_host = new ServiceHost(typeof(TClass), new[] { new Uri("net.pipe://localhost/" + connectionId) });
 					_host.AddServiceEndpoint(typeof(TInterface), hostPipeBinding, "FLExPipe");
