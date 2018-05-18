@@ -154,7 +154,7 @@ namespace IPCFramework
 				}
 				return sb.ToString();
 			}
-			
+
 			/// <summary>
 			/// This callback operates on its own thread.  After finishing the Accept operation,
 			/// start an asynchronous BeginReceive operation on yet another thread.  After
@@ -202,14 +202,28 @@ namespace IPCFramework
 					int bytesRead = handler.EndReceive(ar);
 					if (VerbosityLevel >= 2)
 						Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - handler.EndReceive() read {1} bytes", _endId, bytesRead);
-					if (bytesRead > 0)
+					if (bytesRead > 0 || state.Bldr.Length > 0)
 					{
-						// There  might be more data, so store the data received so far.
+						// There might be more data to come. Store the data received so far.
 						state.Bldr.Append(Encoding.UTF8.GetString(state.Buffer, 0, bytesRead));
 						// Check for end-of-file tag. If it is not there, read more data.
 						string content = state.Bldr.ToString();
-						if (content.Contains("<EOF>"))
+						const string EOF="<EOF>";
+						if (content.Contains(EOF))
 						{
+							// The buffer could contain data from requests for both InformFwProjectName and
+							// BridgeWorkComplete, rather than just one, as seen in LT-19122. If so, cut off
+							// the first set of data, ending with "<EOF>", and save the rest of the data in
+							// state.Bldr so it can be used the next time HostReceiveCallback is run. This would
+							// probably do well to be a loop instead.
+							var remnants = content.Substring(content.IndexOf(EOF, StringComparison.InvariantCulture) + EOF.Length);
+							content = content.Substring(0, content.IndexOf(EOF, StringComparison.InvariantCulture) + EOF.Length);
+							state.Bldr.Clear();
+							if (!string.IsNullOrEmpty(remnants))
+							{
+								state.Bldr.Append(remnants);
+							}
+
 							string[] msg = content.Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
 							if (VerbosityLevel >= 2)
 								Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - message = \"{1}\"", _endId, msg[0]);
@@ -232,7 +246,6 @@ namespace IPCFramework
 							object[] attributes = methodInfo.GetCustomAttributes(typeof(FinishServerTask), true);
 							if (attributes.Length > 0)
 								done = true;
-							state.Bldr.Clear();
 							if (VerbosityLevel >= 2)
 								Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): calling handler.Send(\"finish:{1}\") - done = {2}", _endId, msg[0], done);
 							handler.Send(Encoding.UTF8.GetBytes("finish:"+msg[0]+"\n<EOF>"));
@@ -340,6 +353,6 @@ namespace IPCFramework
 			public int VerbosityLevel { get; set; }
 			#endregion
 		}
-#endif		
+#endif
 	}
 }
