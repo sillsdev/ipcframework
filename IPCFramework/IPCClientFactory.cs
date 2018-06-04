@@ -85,7 +85,7 @@ namespace IPCFramework
 					return false;
 				}
 			}
-			
+
 			public bool RemoteCall(string rpcMethod)
 			{
 				return RemoteCall(rpcMethod, new object[0]);
@@ -109,12 +109,12 @@ namespace IPCFramework
 					return false;
 				}
 			}
-			
+
 			public bool RemoteCall(string rpcMethod, SimpleCallback signalDone)
 			{
 				return RemoteCall(rpcMethod, null, signalDone);
 			}
-			
+
 			public bool RemoteCall(string rpcMethod, object[] args, SimpleCallback signalDone)
 			{
 				try
@@ -133,7 +133,7 @@ namespace IPCFramework
 					return false;
 				}
 			}
-			
+
 			public void Close()
 			{
 				try
@@ -153,7 +153,7 @@ namespace IPCFramework
 				{
 				}
 			}
-			
+
 			public int VerbosityLevel { get; set; }
 			#endregion
 
