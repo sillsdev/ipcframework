@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Reflection;
 
-#if __MonoCS__
+#if MONO
 using System.Net.Sockets;
 using Mono.Unix;
 #endif
@@ -15,14 +15,14 @@ namespace IPCFramework
 	{
 		public static IIPCClient Create()
 		{
-#if __MonoCS__
+#if MONO
 			return new UnixIPCClient();
 #else
 			return new WindowsIPCClient();
 #endif
 		}
 
-#if __MonoCS__
+#if MONO
 		internal class UnixIPCClient : IIPCClient
 		{
 			object _waitObject;

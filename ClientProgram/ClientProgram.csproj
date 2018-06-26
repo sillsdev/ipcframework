@@ -15,7 +15,8 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>..\output\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants Condition="'$(OS)'=='Windows_NT'">DEBUG</DefineConstants>
+    <DefineConstants Condition="'$(OS)'!='Windows_NT'">DEBUG;MONO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -25,6 +26,8 @@
     <DebugType>none</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>..\output\Release</OutputPath>
+    <DefineConstants Condition="'$(OS)'=='Windows_NT'"></DefineConstants>
+    <DefineConstants Condition="'$(OS)'!='Windows_NT'">MONO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -35,7 +38,8 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>..\output\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants Condition="'$(OS)'=='Windows_NT'">DEBUG</DefineConstants>
+    <DefineConstants Condition="'$(OS)'!='Windows_NT'">DEBUG;MONO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,6 +49,8 @@
     <DebugType>none</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>..\output\Release</OutputPath>
+    <DefineConstants Condition="'$(OS)'=='Windows_NT'"></DefineConstants>
+    <DefineConstants Condition="'$(OS)'!='Windows_NT'">MONO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
