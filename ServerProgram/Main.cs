@@ -47,7 +47,7 @@ namespace ServerProgram
 		}
 		public static string ProjectsDirectory
 		{
-#if __MonoCS__
+#if MONO
 			get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "fwrepo/fw/DistFiles/Projects"); }
 #else
 			get { return "C:\\fwrepo\\fw\\DistFiles\\Projects"; }

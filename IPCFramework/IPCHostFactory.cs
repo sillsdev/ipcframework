@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Reflection;
 
-#if __MonoCS__
+#if MONO
 using System.Net.Sockets;
 using Mono.Unix;
 #endif
@@ -31,14 +31,14 @@ namespace IPCFramework
 	{
 		public static IIPCHost Create()
 		{
-#if __MonoCS__
+#if MONO
 			return new UnixIPCHost();
 #else
 			return new WindowsIPCHost();
 #endif
 		}
 
-#if __MonoCS__
+#if MONO
 		internal class UnixIPCHost : IIPCHost
 		{
 			Socket _host;
