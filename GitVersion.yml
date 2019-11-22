@@ -1,0 +1,24 @@
+mode: ContinuousDeployment
+next-version: 1.1
+increment: Patch
+assembly-versioning-scheme: MajorMinorPatchTag
+branches:
+  master:
+    tag:
+    regex: (origin/)?master
+    is-mainline: true
+  develop:
+    tag: unstable
+    regex: (origin/)?develop
+    is-mainline: true
+  lfmerge:
+    tag: lfmerge
+    regex: (origin/)?lfmerge
+    is-mainline: true
+    is-source-branch-for: ['master', 'develop', 'hotfix', 'feature']
+    source-branches: ['master', 'develop', 'hotfix', 'feature']
+  pull-request:
+    mode: ContinuousDeployment
+    tag: PR
+ignore:
+  sha: []

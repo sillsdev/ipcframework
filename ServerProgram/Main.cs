@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using SIL.PlatformUtilities;
 
 namespace ServerProgram
 {
@@ -45,13 +46,8 @@ namespace ServerProgram
 				return Path.GetDirectoryName(p);
 			}
 		}
-		public static string ProjectsDirectory
-		{
-#if MONO
-			get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "fwrepo/fw/DistFiles/Projects"); }
-#else
-			get { return "C:\\fwrepo\\fw\\DistFiles\\Projects"; }
-#endif
-		}
+		public static string ProjectsDirectory => Platform.IsLinux
+			? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "fwrepo/fw/DistFiles/Projects")
+			: "C:\\fwrepo\\fw\\DistFiles\\Projects";
 	}
 }
