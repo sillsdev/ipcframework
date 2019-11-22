@@ -1,79 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{757491D4-A7F2-4FBB-AC9F-321490CC516C}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net461</TargetFrameworks>
     <RootNamespace>ClientProgram</RootNamespace>
     <AssemblyName>ClientProgram</AssemblyName>
+    <Configurations>Debug;Release</Configurations>
+    <Description>ClientProgram</Description>
+    <Company>SIL International</Company>
+    <Authors>SIL International</Authors>
+    <Product>IPCFramework</Product>
+    <Copyright>Copyright © 2013-2019 Stephen McConnel</Copyright>
+    <OutputPath>../output/$(Configuration)</OutputPath>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../ipcframework.snk</AssemblyOriginatorKeyFile>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>..\output\Debug</OutputPath>
-    <DefineConstants Condition="'$(OS)'=='Windows_NT'">DEBUG</DefineConstants>
-    <DefineConstants Condition="'$(OS)'!='Windows_NT'">DEBUG;MONO</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <Externalconsole>True</Externalconsole>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>none</DebugType>
-    <Optimize>True</Optimize>
-    <OutputPath>..\output\Release</OutputPath>
-    <DefineConstants Condition="'$(OS)'=='Windows_NT'"></DefineConstants>
-    <DefineConstants Condition="'$(OS)'!='Windows_NT'">MONO</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <Externalconsole>True</Externalconsole>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>..\output\Debug</OutputPath>
-    <DefineConstants Condition="'$(OS)'=='Windows_NT'">DEBUG</DefineConstants>
-    <DefineConstants Condition="'$(OS)'!='Windows_NT'">DEBUG;MONO</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Externalconsole>True</Externalconsole>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>True</Optimize>
-    <OutputPath>..\output\Release</OutputPath>
-    <DefineConstants Condition="'$(OS)'=='Windows_NT'"></DefineConstants>
-    <DefineConstants Condition="'$(OS)'!='Windows_NT'">MONO</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Externalconsole>True</Externalconsole>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Mono.Posix" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.ServiceModel" />
+    <PackageReference Include="GitVersionTask" Version="5.1.2">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IPCFramework\IPCFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="IPCFramework">
-      <HintPath>..\output\Debug\IPCFramework.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Main.cs" />
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="FLExConnectionHelper.cs" />
-    <Compile Include="CommandLineProcessor.cs" />
-    <Compile Include="CommandLineException.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+
 </Project>

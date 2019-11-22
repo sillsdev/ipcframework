@@ -1,47 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <TargetFrameworks>net461</TargetFrameworks>
     <RootNamespace>IPCFramework</RootNamespace>
-    <AssemblyName>IPCFramework</AssemblyName>
+    <AssemblyTitle>IPCFramework</AssemblyTitle>
+    <Configurations>Debug;Release</Configurations>
+    <Description>Simple interprocess communication framework suitable for either Linux/Mono or Windows/.Net.</Description>
+    <Company>SIL International</Company>
+    <Authors>SIL International</Authors>
+    <Product>IPCFramework</Product>
+    <Copyright>Copyright © 2013-2019 Stephen McConnel</Copyright>
+    <PackageId>SIL.FLExBridge.IPCFramework</PackageId>
+    <PackageLicenseExpression>LGPL-2.1-only OR CPL-1.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/sillsdev/ipcframework</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <OutputPath>../output/$(Configuration)</OutputPath>
+    <PackageOutputPath>../output</PackageOutputPath>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../ipcframework.snk</AssemblyOriginatorKeyFile>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <AppendToReleaseNotesProperty><![CDATA[
+See full changelog at https://github.com/sillsdev/ipcframework/blob/master/CHANGELOG.md]]>
+    </AppendToReleaseNotesProperty>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>..\output\Debug</OutputPath>
-    <DefineConstants Condition="'$(OS)'=='Windows_NT'">DEBUG</DefineConstants>
-    <DefineConstants Condition="'$(OS)'!='Windows_NT'">DEBUG;MONO</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>True</Optimize>
-    <OutputPath>..\output\Release</OutputPath>
-    <DefineConstants Condition="'$(OS)'=='Windows_NT'"></DefineConstants>
-    <DefineConstants Condition="'$(OS)'!='Windows_NT'">MONO</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Mono.Posix" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Net" />
+    <PackageReference Include="GitVersionTask" Version="5.1.2">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
+    <PackageReference Include="SIL.Core" Version="7.0.1-beta0028" />
+    <PackageReference Include="SIL.ReleaseTasks" Version="[2.2.0,)">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.6.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="IPCHostFactory.cs" />
-    <Compile Include="IPCClientFactory.cs" />
-    <Compile Include="IPCInterfaces.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+
 </Project>
