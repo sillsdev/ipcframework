@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace ServerProgram
@@ -37,16 +39,16 @@ namespace ServerProgram
 	{
 		public static string FlexBridgeFolder
 		{
-#if __MonoCS__
-			get { return "/home/steve/Dropbox/IPCDev/ServerProgram/bin/Debug"; }
-#else
-			get { return "C:\\users\\mcconnel\\Dropbox\\IPCDev\\ServerProgram\\bin\\Debug"; }
-#endif
+			get
+			{
+				var p = FileUtils.StripFilePrefix(Assembly.GetExecutingAssembly().CodeBase);
+				return Path.GetDirectoryName(p);
+			}
 		}
 		public static string ProjectsDirectory
 		{
-#if __MonoCS__
-			get { return "/home/steve/fwrepo/fw/DistFiles/Projects"; }
+#if MONO
+			get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "fwrepo/fw/DistFiles/Projects"); }
 #else
 			get { return "C:\\fwrepo\\fw\\DistFiles\\Projects"; }
 #endif

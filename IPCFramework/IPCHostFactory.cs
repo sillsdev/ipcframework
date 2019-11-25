@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Reflection;
 
-#if __MonoCS__
+#if MONO
 using System.Net.Sockets;
 using Mono.Unix;
 #endif
@@ -31,15 +31,15 @@ namespace IPCFramework
 	{
 		public static IIPCHost Create()
 		{
-#if __MonoCS__
+#if MONO
 			return new UnixIPCHost();
 #else
 			return new WindowsIPCHost();
 #endif
 		}
 
-#if __MonoCS__
-		private class UnixIPCHost : IIPCHost
+#if MONO
+		internal class UnixIPCHost : IIPCHost
 		{
 			Socket _host;
 			Type _serviceClass;
@@ -53,23 +53,10 @@ namespace IPCFramework
 				Close();
 			}
 
-			string ComputeEndId (string connectionId)
-			{
-				StringBuilder sb = new StringBuilder();
-				if (connectionId.StartsWith("FLExBridgeEndpoint"))
-					sb.Append("Bridge-");
-				else
-					sb.Append("FLEx-");
-				int idxBegin = connectionId.IndexOf(".fwdata");
-				idxBegin += 7;
-				int idxEnd = connectionId.IndexOf("_", idxBegin);
-				sb.Append(connectionId.Substring(idxBegin, idxEnd - idxBegin));
-				return sb.ToString();
-			}
-
 			#region Implement IIPCHost methods
 			public bool Initialize<TClass,TInterface>(string connectionId, SimpleCallback alert, SimpleCallback cleanup)
 			{
+				var id = TruncateId(connectionId);
 				_endId = ComputeEndId(connectionId);
 				_host = null;
 				_serviceClass = typeof(TClass);
@@ -78,15 +65,17 @@ namespace IPCFramework
 				try
 				{
 					_host = new Socket(AddressFamily.Unix, SocketType.Stream, 0);
-					Console.WriteLine("IPCHost[{0}].Initialize(): binding to {1}", _endId, connectionId);
-					var endPoint = new AbstractUnixEndPoint(connectionId);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCHost[{0}].Initialize(): binding to {1}", _endId, id);
+					var endPoint = new AbstractUnixEndPoint(id);
 					_host.Bind(endPoint);
 					_host.Listen(5);
 					_host.BeginAccept(new AsyncCallback(SocketAcceptCallback), _host);
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine("IPCHost[{0}].Initialize - caught exception: {1}", _endId, ex.Message);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCHost[{0}].Initialize - caught exception: {1}", _endId, ex.Message);
 					if (_host != null)
 					{
 						_host.Close();
@@ -112,7 +101,59 @@ namespace IPCFramework
 					_host = null;
 				}
 			}
+
+			public int VerbosityLevel { get; set; }
 			#endregion
+
+			/// <summary>
+			/// Truncate the specified connectionId.  The byte array for a socket address
+			/// derived from this string has a maximum length of 107 (+1 for the leading
+			/// NUL byte that indicates an "abstract" connection).
+			/// </summary>
+			internal static string TruncateId(string id)
+			{
+				var min = id.IndexOf('/');
+				var lim = id.LastIndexOf('/');
+				if (min < lim)
+				{
+					var x = id.Remove(min, lim - min);
+					x = x.Replace(".fwdata","/");
+					return x;
+				}
+				return id.Replace(".fwdata", "/");
+			}
+
+			string ComputeEndId(string id)
+			{
+				StringBuilder sb = new StringBuilder();
+				if (id.StartsWith("FLExBridgeEndpoint"))
+					sb.Append("Bridge-");
+				else
+					sb.Append("FLEx-");
+				int idxBegin = id.IndexOf(".fwdata");
+				if (idxBegin >= 0)
+				{
+					idxBegin += 7;
+					int idxEnd = id.IndexOf("_", idxBegin);
+					if (idxEnd > idxBegin)
+					{
+						sb.Append(id.Substring(idxBegin, idxEnd - idxBegin));
+					}
+					else
+					{
+						sb.Append(id.Substring(idxBegin));
+					}
+				}
+				else
+				{
+					idxBegin = id.LastIndexOf("/");
+					if (idxBegin > 0)
+						sb.Append(id.Substring(idxBegin));
+					else
+						return id;
+				}
+				return sb.ToString();
+			}
 
 			/// <summary>
 			/// This callback operates on its own thread.  After finishing the Accept operation,
@@ -128,14 +169,16 @@ namespace IPCFramework
 				// Create the state object.
 				var state = new UnixIPCState(_serviceClass);
 				state.WorkSocket = handler;
-//				Console.WriteLine("IPCHost[{0}].SocketAcceptCallback() - calling handler.BeginReceive(..., HostReceiveCallback, ...)", _endId);
+				if (VerbosityLevel >= 2)
+					Console.WriteLine("IPCHost[{0}].SocketAcceptCallback() - calling handler.BeginReceive(..., HostReceiveCallback, ...)", _endId);
 				handler.BeginReceive(state.Buffer, 0, UnixIPCState.BufferSize, 0,
 					new AsyncCallback(HostReceiveCallback), state);
 				while (_host != null)
 				{
 					if (handler.Poll(10000, SelectMode.SelectError))
 					{
-//						Console.WriteLine("IPCHost[{0}].SocketAcceptCallback() - calling alert and cleanup delegates", _endId);
+						if (VerbosityLevel >= 2)
+							Console.WriteLine("IPCHost[{0}].SocketAcceptCallback() - calling alert and cleanup delegates", _endId);
 						if (_alert != null)
 							_alert();
 						if (_cleanup != null)
@@ -148,7 +191,8 @@ namespace IPCFramework
 
 			void HostReceiveCallback(IAsyncResult ar)
 			{
-//				Console.WriteLine("IPCHost[{0}].HostReceiveCallback()", _endId);
+				if (VerbosityLevel >= 2)
+					Console.WriteLine("IPCHost[{0}].HostReceiveCallback()", _endId);
 				bool done = false;
 				var state = (UnixIPCState)ar.AsyncState;
 				var handler = state.WorkSocket;
@@ -156,17 +200,33 @@ namespace IPCFramework
 				{
 					// Read data from the client socket.
 					int bytesRead = handler.EndReceive(ar);
-//					Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - handler.EndReceive() read {1} bytes", _endId, bytesRead);
-					if (bytesRead > 0)
+					if (VerbosityLevel >= 2)
+						Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - handler.EndReceive() read {1} bytes", _endId, bytesRead);
+					if (bytesRead > 0 || state.Bldr.Length > 0)
 					{
-						// There  might be more data, so store the data received so far.
+						// There might be more data to come. Store the data received so far.
 						state.Bldr.Append(Encoding.UTF8.GetString(state.Buffer, 0, bytesRead));
 						// Check for end-of-file tag. If it is not there, read more data.
 						string content = state.Bldr.ToString();
-						if (content.Contains("<EOF>"))
+						const string EOF="<EOF>";
+						if (content.Contains(EOF))
 						{
+							// The buffer could contain data from requests for both InformFwProjectName and
+							// BridgeWorkComplete, rather than just one, as seen in LT-19122. If so, cut off
+							// the first set of data, ending with "<EOF>", and save the rest of the data in
+							// state.Bldr so it can be used the next time HostReceiveCallback is run. This would
+							// probably do well to be a loop instead.
+							var remnants = content.Substring(content.IndexOf(EOF, StringComparison.InvariantCulture) + EOF.Length);
+							content = content.Substring(0, content.IndexOf(EOF, StringComparison.InvariantCulture) + EOF.Length);
+							state.Bldr.Clear();
+							if (!string.IsNullOrEmpty(remnants))
+							{
+								state.Bldr.Append(remnants);
+							}
+
 							string[] msg = content.Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
-//							Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - message = \"{1}\"", _endId, msg[0]);
+							if (VerbosityLevel >= 2)
+								Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - message = \"{1}\"", _endId, msg[0]);
 							var methodInfo = _serviceClass.GetMethod(msg[0]);
 							var parInfo = methodInfo.GetParameters();
 							object[] parameters = new object[parInfo.Length];
@@ -174,19 +234,20 @@ namespace IPCFramework
 							{
 								var typeName = parInfo[i].ParameterType.FullName;
 								if (typeName == "System.String")
-									parameters[i] = msg[i+1];
+									parameters[i] = msg[i+1] == "<EOF>" ? "" : msg[i+1];
 								else if (typeName == "System.Boolean")
 									parameters[i] = msg[i+1] == true.ToString();
 								else if (typeName == "System.Int32")
 									parameters[i] = Int32.Parse(msg[i+1]);
 							}
 							methodInfo.Invoke(state.Service, parameters);
-							Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): finished executing {1}", _endId, msg[0]);
+							if (VerbosityLevel >= 1)
+								Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): finished executing {1}", _endId, msg[0]);
 							object[] attributes = methodInfo.GetCustomAttributes(typeof(FinishServerTask), true);
 							if (attributes.Length > 0)
 								done = true;
-							state.Bldr.Clear();
-//							Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): calling handler.Send(\"finish:{1}\") - done = {2}", _endId, msg[0], done);
+							if (VerbosityLevel >= 2)
+								Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): calling handler.Send(\"finish:{1}\") - done = {2}", _endId, msg[0], done);
 							handler.Send(Encoding.UTF8.GetBytes("finish:"+msg[0]+"\n<EOF>"));
 						}
 						else
@@ -195,7 +256,8 @@ namespace IPCFramework
 						}
 						if (!done)
 						{
-//							Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): calling handler.BeginReceive(..., HostReceiveCallback, ...)", _endId);
+							if (VerbosityLevel >= 2)
+								Console.WriteLine("IPCHost[{0}].HostReceiveCallback(): calling handler.BeginReceive(..., HostReceiveCallback, ...)", _endId);
 							handler.BeginReceive(state.Buffer, 0, UnixIPCState.BufferSize, 0,
 							                     new AsyncCallback(HostReceiveCallback), state);
 						}
@@ -203,7 +265,8 @@ namespace IPCFramework
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - caught exception: {1}", _endId, e.Message);
+					if (VerbosityLevel >= 1)
+						Console.WriteLine("IPCHost[{0}].HostReceiveCallback() - caught exception: {1}", _endId, e.Message);
 					if (_alert != null)
 						_alert();
 					if (_cleanup != null)
@@ -243,7 +306,12 @@ namespace IPCFramework
 			{
 				try
 				{
-					var hostPipeBinding = new NetNamedPipeBinding { ReceiveTimeout = TimeSpan.MaxValue };
+					// Increase timeouts over the default values of 1 minute, allow receives to take forever to allow us to open a call which detects when
+					// the remote program crashes. This lets us lock one program out while the other end is processing.
+					var hostPipeBinding = new NetNamedPipeBinding
+					{
+						ReceiveTimeout = TimeSpan.MaxValue, SendTimeout = TimeSpan.FromMinutes(3), OpenTimeout = TimeSpan.FromMinutes(3)
+					};
 					//open host ready for business
 					_host = new ServiceHost(typeof(TClass), new[] { new Uri("net.pipe://localhost/" + connectionId) });
 					_host.AddServiceEndpoint(typeof(TInterface), hostPipeBinding, "FLExPipe");
@@ -281,8 +349,10 @@ namespace IPCFramework
 				}
 				_host = null;
 			}
+
+			public int VerbosityLevel { get; set; }
 			#endregion
 		}
-#endif		
+#endif
 	}
 }

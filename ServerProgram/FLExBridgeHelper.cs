@@ -215,12 +215,14 @@ namespace ServerProgram
 
 			if (_noBlockerHost != null)
 			{
+				Console.WriteLine("FLExBridgeHelper.LaunchFieldworksBridge(): _noblockerHost already set!??");
 				return false;
 			}
 			AddArg(ref args, "-pipeID", _pipeID);
 
 			// make a new FLExBridge
 			IIPCHost host = IPCHostFactory.Create();
+			host.VerbosityLevel = 1;
 			if (!host.Initialize<FLExBridgeService,IFLExBridgeService>("FLExBridgeEndpoint" + _pipeID, AlertFlex, CleanupHost))
 				return false;
 
@@ -232,6 +234,7 @@ namespace ServerProgram
 		{
 			// Launch the bridge process.
 			// Start the child process.
+			Console.WriteLine("About to start {0}", FullFieldWorksBridgePath());
 			using (Process.Start(FullFieldWorksBridgePath(), args))
 			{
 			}
@@ -252,6 +255,7 @@ namespace ServerProgram
 			}
 			else
 			{
+				Console.WriteLine("FLExBridgeHelper.LaunchFlexBridge(): waiting for FlexBridge to terminate...");
 				//// This uses all the piping and also blocks the Flex UI thread, while Flex Bridge is running.
 				//Cursor.Current = Cursors.WaitCursor;
 				// Pause UI thread until FLEx Bridge terminates:
@@ -296,6 +300,7 @@ namespace ServerProgram
 			try
 			{
 				_client = IPCClientFactory.Create();
+				_client.VerbosityLevel = 1;
 				_client.Initialize<IFLExService>("FLExEndpoint" + pipeID, _waitObject, CleanupHost);
 				_client.RemoteCall("BridgeWorkOngoing", SignalCompletion);
 			}
