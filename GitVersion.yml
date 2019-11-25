@@ -1,22 +1,20 @@
+assembly-versioning-scheme: MajorMinor
 mode: ContinuousDeployment
 next-version: 1.1
 increment: Patch
-assembly-versioning-scheme: MajorMinorPatchTag
 branches:
   master:
-    tag:
+    tag: beta
     regex: (origin/)?master
-    is-mainline: true
-  develop:
-    tag: unstable
-    regex: (origin/)?develop
-    is-mainline: true
-  lfmerge:
-    tag: lfmerge
-    regex: (origin/)?lfmerge
-    is-mainline: true
-    is-source-branch-for: ['master', 'develop', 'hotfix', 'feature']
-    source-branches: ['master', 'develop', 'hotfix', 'feature']
+    is-source-branch-for: [ 'hotfix', 'pull-request' ]
+  hotfix:
+    tag: beta
+    regex: (origin/)?hotfix[/-]
+    increment: Patch
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    tracks-release-branches: false
+    is-release-branch: false
   pull-request:
     mode: ContinuousDeployment
     tag: PR

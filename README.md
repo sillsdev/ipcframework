@@ -1,14 +1,15 @@
-= IPCFramework =
+# IPCFramework
 
 This project provides a simple C# interprocess communication mechanism that
 works on both Windows/.Net and Linux/Mono.  The Windows side is implemented
 using the WCF NetNamedPipe feature.  The Linux side is implemented with Unix
 Domain Sockets.
 
-== Build ==
+## Build
 
-In *Windows*, build solution IPCFramework.sln from Visual Studio.
+On Windows or Linux, build the solution `IPCFramework.sln` in Visual Studio/
+VSCode/Rider, or use the command line:
 
-In *Linux*, install package mono5-sil and run
-
-    PATH="/opt/mono5-sil/bin:$PATH" xbuild /t:rebuild
+```bash
+msbuild /t:restore,build IPCFramework.sln
+```
