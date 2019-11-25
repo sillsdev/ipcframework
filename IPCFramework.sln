@@ -1,17 +1,19 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerProgram", "ServerProgram\ServerProgram.csproj", "{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerProgram", "ServerProgram\ServerProgram.csproj", "{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8} = {CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8}
 		{757491D4-A7F2-4FBB-AC9F-321490CC516C} = {757491D4-A7F2-4FBB-AC9F-321490CC516C}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientProgram", "ClientProgram\ClientProgram.csproj", "{757491D4-A7F2-4FBB-AC9F-321490CC516C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientProgram", "ClientProgram\ClientProgram.csproj", "{757491D4-A7F2-4FBB-AC9F-321490CC516C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8} = {CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPCFramework", "IPCFramework\IPCFramework.csproj", "{CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPCFramework", "IPCFramework\IPCFramework.csproj", "{CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,20 +25,20 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Debug|x86.ActiveCfg = Debug|x86
-		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Debug|x86.Build.0 = Debug|x86
+		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Debug|x86.Build.0 = Debug|Any CPU
 		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Release|Any CPU.Build.0 = Release|Any CPU
-		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Release|x86.ActiveCfg = Release|x86
-		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Release|x86.Build.0 = Release|x86
+		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Release|x86.ActiveCfg = Release|Any CPU
+		{68CCD6AC-F845-4C7B-A07C-00D29DF87F59}.Release|x86.Build.0 = Release|Any CPU
 		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Debug|x86.ActiveCfg = Debug|x86
-		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Debug|x86.Build.0 = Debug|x86
+		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Debug|x86.Build.0 = Debug|Any CPU
 		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Release|x86.ActiveCfg = Release|x86
-		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Release|x86.Build.0 = Release|x86
+		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Release|x86.ActiveCfg = Release|Any CPU
+		{757491D4-A7F2-4FBB-AC9F-321490CC516C}.Release|x86.Build.0 = Release|Any CPU
 		{CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -48,6 +50,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2426229B-461B-4F5D-A42F-72816C16C4FA}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = ServerProgram\ServerProgram.csproj
