@@ -5,7 +5,7 @@
     <RootNamespace>IPCFramework</RootNamespace>
     <AssemblyTitle>IPCFramework</AssemblyTitle>
     <Configurations>Debug;Release</Configurations>
-    <Description>Simple interprocess communication framework suitable for either Linux/Mono or Windows/.Net.</Description>
+    <Description>Simple interprocess communication framework for FLExBridge suitable for either Linux/Mono or Windows/.Net.</Description>
     <Company>SIL International</Company>
     <Authors>SIL International</Authors>
     <Product>IPCFramework</Product>
