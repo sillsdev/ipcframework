@@ -13,9 +13,6 @@ build:
   publish_nuget: true
   publish_nuget_symbols: true
   use_snupkg_format: true
-artifacts:
-- path: output/*nupkg
-  name: nuget
 deploy:
 - provider: Environment
   name: sil-lsdev nuget
