@@ -2,13 +2,15 @@ branches:
   only:
   - master
 image: Visual Studio 2019
+environment:
+  IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1
 nuget:
   disable_publish_on_pr: true
   disable_publish_octopus: true
 before_build:
 - cmd: msbuild /t:restore
 build:
-  verbosity: minimal
+  verbosity: normal
   publish_nuget: true
   publish_nuget_symbols: true
   use_snupkg_format: true
