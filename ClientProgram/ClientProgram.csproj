@@ -10,7 +10,7 @@
     <Company>SIL International</Company>
     <Authors>SIL International</Authors>
     <Product>IPCFramework</Product>
-    <Copyright>Copyright © 2013-2019 Stephen McConnel</Copyright>
+    <Copyright>Copyright © 2013-2021 Stephen McConnel/SIL International</Copyright>
     <OutputPath>../output/$(Configuration)</OutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>../ipcframework.snk</AssemblyOriginatorKeyFile>

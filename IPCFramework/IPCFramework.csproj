@@ -9,7 +9,7 @@
     <Company>SIL International</Company>
     <Authors>SIL International</Authors>
     <Product>IPCFramework</Product>
-    <Copyright>Copyright © 2013-2019 Stephen McConnel</Copyright>
+    <Copyright>Copyright © 2013-2021 Stephen McConnel/SIL International</Copyright>
     <PackageId>SIL.FLExBridge.IPCFramework</PackageId>
     <PackageLicenseExpression>LGPL-2.1-only OR CPL-1.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/sillsdev/ipcframework</PackageProjectUrl>

@@ -15,6 +15,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientProgram", "ClientProg
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPCFramework", "IPCFramework\IPCFramework.csproj", "{CEBBBDBD-AF78-48BA-B3BF-DA3A3405AED8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionFolder", "{B00989F8-AC83-43F1-83AE-D3895F6BCCB6}"
+ProjectSection(SolutionItems) = preProject
+	.editorconfig = .editorconfig
+	.gitignore = .gitignore
+	CHANGELOG.md = CHANGELOG.md
+	GitVersion.yml = GitVersion.yml
+	README.md = README.md
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
