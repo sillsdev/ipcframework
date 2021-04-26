@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2021-04-26
+
 ### Changed
 
 - Create nuget package
+
+[Unreleased]: https://github.com/sillsdev/ipcframework/compare/v1.1.0...master
+
+[1.1.0]: https://github.com/sillsdev/ipcframework/compare/a71e4aa...v1.1.0
