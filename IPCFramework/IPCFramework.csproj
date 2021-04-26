@@ -28,10 +28,10 @@ See full changelog at https://github.com/sillsdev/ipcframework/blob/master/CHANG
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.6.4" PrivateAssets="all" />
+    <PackageReference Include="GitVersion.MsBuild" Version="5.6.8" PrivateAssets="all" />
     <PackageReference Include="Mono.Posix-4.5" Version="4.5.0" />
-    <PackageReference Include="SIL.Core" Version="8.0.0-beta0259" />
-    <PackageReference Include="SIL.ReleaseTasks" Version="2.4.0" PrivateAssets="all" />
+    <PackageReference Include="SIL.Core" Version="8.0.0" />
+    <PackageReference Include="SIL.ReleaseTasks" Version="2.5.0" PrivateAssets="all" />
     <PackageReference Include="System.ServiceModel.NetTcp" Version="4.6.0" />
   </ItemGroup>
 
