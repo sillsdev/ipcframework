@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.1] - 2022-12-16
+
 ### Fixed
 
 - Swallow exceptions and return false (https://jira.sil.org/browse/LT-19036)
@@ -26,6 +28,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Create nuget package
 
-[Unreleased]: https://github.com/sillsdev/ipcframework/compare/v1.1.0...master
+[Unreleased]: https://github.com/sillsdev/ipcframework/compare/v1.1.1...master
+
+[1.1.1]: https://github.com/sillsdev/ipcframework/compare/v1.1.0...v1.1.1
 
 [1.1.0]: https://github.com/sillsdev/ipcframework/compare/a71e4aa...v1.1.0
