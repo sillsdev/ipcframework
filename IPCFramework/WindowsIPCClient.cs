@@ -40,7 +40,7 @@ namespace IPCFramework
 			{
 				Console.WriteLine("WindowsIPCClient.Initialize(\"{0}\") caught exception: {1}",
 					connectionId, ex.Message);
-				throw;
+				return false;
 			}
 		}
 
@@ -54,29 +54,14 @@ namespace IPCFramework
 			try
 			{
 				var mi = _clientType.GetMethod(rpcMethod);
-				if (mi != null)
-				{
-					try
-					{
-						mi.Invoke(_channel, args);
-					}
-					catch (TargetInvocationException e)
-					{
-						// A dropped connection means we cannot call the other end. Return false, but don't throw.
-						if (e.InnerException is EndpointNotFoundException)
-							return false;
-						throw; //other reasons for failing are exceptional
-					}
-				}
+				mi?.Invoke(_channel, args);
 				return true;
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine("WindowsIPCClient.RemoteCall(\"{0}\") caught exception: {1}",
 					rpcMethod, ex.Message);
-				if (rpcMethod == "BridgeWorkComplete")
-					return false;
-				throw;
+				return false;
 			}
 		}
 
@@ -95,7 +80,7 @@ namespace IPCFramework
 			{
 				Console.WriteLine("WindowsIPCClient.RemoteCall(\"{0}\") caught exception: {1}",
 					rpcMethod, ex.Message);
-				throw;
+				return false;
 			}
 		}
 

@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Swallow exceptions and return false (https://jira.sil.org/browse/LT-19036)
+
 ## [1.1.0] - 2021-04-26
 
 ### Changed
